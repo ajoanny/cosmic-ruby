@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+require 'yaml'
+require 'active_record'
+
+db_config       = YAML::load(File.open('config/database.yml'))
+ActiveRecord::Base.establish_connection(db_config)
 
 RSpec.configure do |config|
   config.filter_run_when_matching :focus

@@ -13,7 +13,7 @@ require 'cosmic-ruby/domain/allocate'
 describe 'allocate' do
   it 'allocate the order line to current batch' do
     currentBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(100), nil
-    otherBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(100), Date.new(1, 1, 2000)
+    otherBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2000)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
     allocate(line, [currentBatch, otherBatch])
@@ -23,9 +23,9 @@ describe 'allocate' do
   end
 
   it 'allocate the order line to the earliest batch' do
-    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(100), Date.new(1, 1, 2000)
-    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(100), Date.new(1, 1, 2001)
-    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Date.new(1, 1, 2002)
+    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2000)
+    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2001)
+    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
     allocate(line, [mediumBatch, earliestBatch, latestBatch])
@@ -36,9 +36,9 @@ describe 'allocate' do
   end
 
   it 'allocate the order line to the earliest batch where the line is allocable' do
-    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Date.new(1, 1, 2000)
-    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(2), Date.new(1, 1, 2001)
-    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Date.new(1, 1, 2002)
+    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2000)
+    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(2), Custom::Date.new(1, 1, 2001)
+    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
     allocate(line, [mediumBatch, earliestBatch, latestBatch])
@@ -49,9 +49,9 @@ describe 'allocate' do
   end
 
   it 'return the reference of the used batch' do
-    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Date.new(1, 1, 2000)
-    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(2), Date.new(1, 1, 2001)
-    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(1), Date.new(1, 1, 2002)
+    earliestBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2000)
+    mediumBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(2), Custom::Date.new(1, 1, 2001)
+    latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(2)
 
     reference = allocate(line, [mediumBatch, earliestBatch, latestBatch])
@@ -60,7 +60,7 @@ describe 'allocate' do
   end
 
   it 'raises an exception when there is no batch available' do
-    batch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Date.new(1, 1, 2000)
+    batch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2000)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(2)
     exception = OutOfStock.new
 
