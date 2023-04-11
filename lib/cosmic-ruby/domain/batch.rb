@@ -1,6 +1,7 @@
 class Batch
   attr :sku, :quantity, :lines, :eat
   attr_reader :reference, :eta
+  attr_accessor :id
   def initialize reference, sku, quantity, eta, lines = []
     @reference = reference
     @sku = sku

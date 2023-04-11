@@ -26,7 +26,6 @@ ActiveRecord::Schema.define(version: 2023_04_06_185037) do
     t.string "order_id"
     t.string "sku"
     t.integer "quantity"
-    t.string "eta"
     t.bigint "batch_id"
   end
 

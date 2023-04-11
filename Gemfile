@@ -10,3 +10,6 @@ gem "rspec", "~> 3.0"
 gem 'guard-rspec', require: false
 gem 'activerecord'
 gem 'pg'
+gem 'sinatra'
+gem 'puma'
+gem 'rack-test'

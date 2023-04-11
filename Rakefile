@@ -69,3 +69,12 @@ end
     abort # needed stop other tasks
   end
 end
+
+namespace :run do
+  task :orm do
+    db_config       = YAML::load(File.open('config/database.yml'))
+    ActiveRecord::Base.establish_connection(db_config)
+
+    ruby 'lib/cosmic-ruby/tests.rb'
+  end
+end

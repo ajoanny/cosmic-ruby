@@ -10,13 +10,13 @@ require 'cosmic-ruby/domain/date'
 require 'cosmic-ruby/domain/allocate'
 
 
-describe 'allocate' do
+describe 'allocate_in_batches' do
   it 'allocate the order line to current batch' do
     currentBatch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(100), nil
     otherBatch = Batch.new Reference.new('REF2'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2000)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
-    allocate(line, [currentBatch, otherBatch])
+    allocate_in_batches(line, [currentBatch, otherBatch])
 
     expect(currentBatch.available_quantity).to eq Quantity.new(90)
     expect(currentBatch.available_quantity).to eq Quantity.new(90)
@@ -28,7 +28,7 @@ describe 'allocate' do
     latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
-    allocate(line, [mediumBatch, earliestBatch, latestBatch])
+    allocate_in_batches(line, [mediumBatch, earliestBatch, latestBatch])
 
     expect(earliestBatch.available_quantity).to eq Quantity.new(90)
     expect(mediumBatch.available_quantity).to eq Quantity.new(100)
@@ -41,7 +41,7 @@ describe 'allocate' do
     latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(100), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(10)
 
-    allocate(line, [mediumBatch, earliestBatch, latestBatch])
+    allocate_in_batches(line, [mediumBatch, earliestBatch, latestBatch])
 
     expect(earliestBatch.available_quantity).to eq Quantity.new(1)
     expect(mediumBatch.available_quantity).to eq Quantity.new(2)
@@ -54,7 +54,7 @@ describe 'allocate' do
     latestBatch = Batch.new Reference.new('REF3'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2002)
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(2)
 
-    reference = allocate(line, [mediumBatch, earliestBatch, latestBatch])
+    reference = allocate_in_batches(line, [mediumBatch, earliestBatch, latestBatch])
 
     expect(reference).to eq Reference.new('REF2')
   end
@@ -64,6 +64,6 @@ describe 'allocate' do
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(2)
     exception = OutOfStock.new
 
-    expect { allocate(line, [batch]) }.to raise_error(exception)
+    expect { allocate_in_batches(line, [batch]) }.to raise_error(exception)
   end
 end

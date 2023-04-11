@@ -4,8 +4,8 @@ require 'cosmic-ruby/infrastructure/ORM/order_line'
 
 class FakeBatchRepository < BatchRepository
 
-  def initialize
-    @set = Set[]
+  def initialize set = Set[]
+    @set = set
   end
 
   def get(reference)

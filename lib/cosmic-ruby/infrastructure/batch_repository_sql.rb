@@ -4,16 +4,20 @@ require 'cosmic-ruby/infrastructure/ORM/order_line'
 
 class BatchRepositorySql < BatchRepository
 
+  def initialize session
+    @session = session
+  end
+
   def get(reference)
     batch = ORM::Batch.find_by!(reference: reference.reference)
     batch.lines = ORM::OrderLine.where(batch_id: batch.id)
-    ORM::Batch.to_model batch
+    model = ORM::Batch.to_model batch
+    @session.add ORM::Batch, :save, model
+    model
   end
 
   def add(batch)
-    batch_bdd = ORM::Batch.from(batch)
-    batch_bdd.save
-    batch.lines.each { |line| ORM::OrderLine.from(line, batch_bdd.id).save }
+    @session.add ORM::Batch, :save, batch
   end
 
   def list

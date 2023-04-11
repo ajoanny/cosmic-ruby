@@ -7,7 +7,7 @@ require 'cosmic-ruby/domain/reference'
 require 'cosmic-ruby/domain/sku'
 require 'cosmic-ruby/domain/date'
 
-fdescribe Batch do
+describe Batch do
   describe '#allocate' do
       it 'decrease quantity available in the batch by the quantity of the order line' do
         batch = Batch.new(Reference.new('REF'), Sku.new('SMALL-TABLE'), Quantity.new(20), Custom::Date.new(1, 1, 2023))

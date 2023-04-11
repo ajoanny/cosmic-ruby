@@ -4,7 +4,6 @@ class CreateOrderLineTable < ActiveRecord::Migration[6.0]
       t.string :order_id
       t.string :sku
       t.integer :quantity
-      t.string :eta
       t.bigint :batch_id
     end
   end

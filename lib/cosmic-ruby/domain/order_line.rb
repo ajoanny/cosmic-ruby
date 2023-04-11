@@ -2,6 +2,7 @@ class OrderLine
   attr :order_id, :quantity, :sku
   attr_reader :order_id, :quantity, :sku
   alias_method :eql?, :==
+  attr_accessor :id
 
   def initialize order_id, sku, quantity
     @order_id = order_id

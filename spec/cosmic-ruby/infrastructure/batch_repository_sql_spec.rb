@@ -9,19 +9,19 @@ require 'cosmic-ruby/infrastructure/batch_repository_sql'
 require 'cosmic-ruby/infrastructure/fake_batch_repository'
 require 'cosmic-ruby/infrastructure/ORM/batch'
 require 'cosmic-ruby/infrastructure/ORM/order_line'
+require 'cosmic-ruby/infrastructure/ORM/order_line'
+require 'cosmic-ruby/infrastructure/session'
 
 describe BatchRepositorySql do
-  after(:each) do
-    ORM::Batch.destroy_all
-    ORM::OrderLine.destroy_all
-  end
-  let(:repository) { BatchRepositorySql.new }
+  let(:session) { Session.new }
+  let(:repository) { BatchRepositorySql.new session }
 
   describe 'add' do
     it 'returns a batch added with its order lines' do
       expected_batch = Batch.new(Reference.new('REF'), Sku.new('TABLE'), Quantity.new(12), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF'), Sku.new('TABLE'), Quantity.new(12))])
 
       repository.add(expected_batch)
+      session.commit()
       batch = repository.get(Reference.new('REF'))
 
       expect(batch.reference).to eq expected_batch.reference
@@ -36,6 +36,7 @@ describe BatchRepositorySql do
 
       repository.add(expected_batch)
       repository.add(Batch.new(Reference.new('REF1'), Sku.new('TABLE1'), Quantity.new(1), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF1'), Sku.new('TABLE1'), Quantity.new(1))]))
+      session.commit()
       batch = repository.get(Reference.new('REF'))
 
       expect(batch.reference).to eq expected_batch.reference
@@ -47,17 +48,15 @@ describe BatchRepositorySql do
 
     describe 'list' do
       it 'returns all batches' do
-
-
         repository.add(Batch.new(Reference.new('REF'), Sku.new('TABLE'), Quantity.new(12), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF'), Sku.new('TABLE'), Quantity.new(12))]))
         repository.add(Batch.new(Reference.new('REF1'), Sku.new('TABLE1'), Quantity.new(1), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF1'), Sku.new('TABLE1'), Quantity.new(1))]))
         repository.add(Batch.new(Reference.new('REF2'), Sku.new('TABLE1'), Quantity.new(1), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF1'), Sku.new('TABLE1'), Quantity.new(1))]))
+        session.commit()
         batches = repository.list
-
         expect(batches[0].reference).to eq Reference.new('REF')
         expect(batches[1].reference).to eq Reference.new('REF1')
         expect(batches[2].reference).to eq Reference.new('REF2')
-      end
+        end
     end
   end
 end

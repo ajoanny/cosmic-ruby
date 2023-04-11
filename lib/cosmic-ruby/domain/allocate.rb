@@ -1,4 +1,4 @@
-def allocate order_line, batches
+def allocate_in_batches order_line, batches
   batch = batches
     .select { |batch| batch.allocable? order_line}
     .sort
