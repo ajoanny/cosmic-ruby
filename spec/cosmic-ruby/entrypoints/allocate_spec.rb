@@ -2,6 +2,7 @@ require 'ostruct'
 require 'json'
 
 require 'cosmic-ruby/infrastructure/session'
+require 'cosmic-ruby/infrastructure/unit_of_work_active_record'
 
 class AllocateServer < ServerTest
   include Allocate
@@ -18,10 +19,7 @@ describe 'Route Allocate' do
     end
 
     it 'returns the batch reference' do
-      app.inject OpenStruct.new({
-        batch_repository: BatchRepositorySql.new(session),
-        session: session
-      })
+      app.inject OpenStruct.new({ uow: UnitOfWorkActiveRecord.new(session) })
 
       get "/allocate", order_id: '1', sku: 'TABLE', quantity: 1
 
@@ -30,10 +28,8 @@ describe 'Route Allocate' do
     end
 
     it 'returns an error' do
-      app.inject OpenStruct.new({
-        batch_repository: BatchRepositorySql.new(session),
-        session: session
-      })
+      app.inject OpenStruct.new({ uow: UnitOfWorkActiveRecord.new(session) })
+
       get "/allocate", order_id: '1', sku: 'LAMP', quantity: 1
 
       expect(last_response.status).to eq 400
@@ -49,13 +45,45 @@ describe 'Route Allocate' do
     end
 
     it 'returns 200' do
-      app.inject OpenStruct.new({
-        batch_repository: BatchRepositorySql.new(session),
-        session: session
-      })
+      app.inject OpenStruct.new({ uow: UnitOfWorkActiveRecord.new(session) })
+
       post "/deallocate", order_id: '1', sku: 'TABLE', quantity: 1, reference: 'R1'
-      pp last_response
       expect(last_response.status).to eq 200
     end
   end
+
+  describe 'Route Reallocate' do
+    before(:each) do
+      batch = ORM::Batch.from(Batch.new Reference.new('R1'), Sku.new('TABLE'), Quantity.new(1), Custom::Date.new(1,1,2023))
+      ORM::Batch.from(Batch.new Reference.new('R2'), Sku.new('TABLE'), Quantity.new(1), nil).save
+      batch.save
+      ORM::OrderLine.from(OrderLine.new(OrderId.new('1'), Sku.new('TABLE'), Quantity.new(1)), batch.id).save
+    end
+
+    it 'returns 200' do
+      app.inject OpenStruct.new({ uow: UnitOfWorkActiveRecord.new(session) })
+
+      post "/reallocate", order_id: '1', sku: 'TABLE', quantity: 1, reference: 'R1'
+
+      expect(last_response.status).to eq 200
+    end
+  end
+
+  fdescribe 'Route Change_Quantity' do
+    before(:each) do
+      batch = ORM::Batch.from(Batch.new Reference.new('R1'), Sku.new('TABLE'), Quantity.new(1), Custom::Date.new(1,1,2023))
+      ORM::Batch.from(Batch.new Reference.new('R2'), Sku.new('TABLE'), Quantity.new(1), nil).save
+      batch.save
+      ORM::OrderLine.from(OrderLine.new(OrderId.new('1'), Sku.new('TABLE'), Quantity.new(1)), batch.id).save
+    end
+
+    it 'returns 200' do
+      app.inject OpenStruct.new({ uow: UnitOfWorkActiveRecord.new(session) })
+
+      post "/change_quantity", quantity: 1, reference: 'R1'
+
+      expect(last_response.status).to eq 200
+    end
+  end
+
 end

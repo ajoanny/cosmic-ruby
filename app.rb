@@ -11,9 +11,7 @@ class App < Sinatra::Base
 
   def dependencies
     session = Session.new
-    OpenStruct.new({
-      batch_repositories: BatchRepositorySql.new(dependencies.session),
-      session: session
-    })
+    uow = UnitOfWorkActiveRecord.new session
+    OpenStruct.new({ uow: uow })
   end
 end

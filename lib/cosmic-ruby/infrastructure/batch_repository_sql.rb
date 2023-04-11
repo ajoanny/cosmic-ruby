@@ -10,10 +10,12 @@ class BatchRepositorySql < BatchRepository
 
   def get(reference)
     batch = ORM::Batch.find_by!(reference: reference.reference)
-    batch.lines = ORM::OrderLine.where(batch_id: batch.id)
-    model = ORM::Batch.to_model batch
-    @session.add ORM::Batch, :save, model
-    model
+    to_model(batch)
+  end
+
+  def of(sku)
+    batches = ORM::Batch.where(sku: sku.sku)
+    batches.map(&method(:to_model))
   end
 
   def add(batch)
@@ -25,5 +27,14 @@ class BatchRepositorySql < BatchRepository
       batch.lines = ORM::OrderLine.where(batch_id: batch.id)
       ORM::Batch.to_model batch
     end
+  end
+
+  private
+
+  def to_model(batch)
+    batch.lines = ORM::OrderLine.where(batch_id: batch.id)
+    model = ORM::Batch.to_model batch
+    @session.add ORM::Batch, :save, model
+    model
   end
 end

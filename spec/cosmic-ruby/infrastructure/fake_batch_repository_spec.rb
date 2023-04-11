@@ -9,7 +9,7 @@ require 'cosmic-ruby/infrastructure/fake_batch_repository'
 require 'cosmic-ruby/infrastructure/ORM/batch'
 require 'cosmic-ruby/infrastructure/ORM/order_line'
 
-describe BatchRepositorySql do
+describe FakeBatchRepository do
 
   let(:repository) { FakeBatchRepository.new }
 

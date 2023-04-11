@@ -1,5 +1,7 @@
-def deallocate order_line, reference, batch_repository, session
-  batch = batch_repository.get reference
-  batch.deallocate order_line
-  session.commit
+def deallocate order_line, reference, uow
+  uow.persists do
+    batch = uow.batches.get reference
+    batch.deallocate order_line
+    uow.commit
+  end
 end

@@ -12,6 +12,10 @@ class FakeBatchRepository < BatchRepository
     @set.find { |batch| batch.reference == reference }
   end
 
+  def of(sku)
+    @set.select { |batch| batch.sku == sku }
+  end
+
   def add(batch)
     @set.add batch
   end

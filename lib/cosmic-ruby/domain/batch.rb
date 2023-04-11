@@ -31,6 +31,13 @@ class Batch
     @lines.delete order_line
   end
 
+  def change_quantity quantity
+    @quantity = quantity
+    while available_quantity < Quantity.new(0)
+      lines.pop
+    end
+  end
+
   def <=> other
     other.eta <=> self.eta
   end

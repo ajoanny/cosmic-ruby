@@ -8,7 +8,6 @@ class Session
   end
 
   def commit
-    puts @objects_to_persist.size
     @objects_to_persist.each do |orm_class, method, object|
       orm_class.send(:from,object)
                .send(method)
