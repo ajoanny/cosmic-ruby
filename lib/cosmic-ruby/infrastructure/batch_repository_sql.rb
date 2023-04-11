@@ -19,13 +19,12 @@ class BatchRepositorySql < BatchRepository
   end
 
   def add(batch)
-    @session.add ORM::Batch, :save, batch
+    @session.add ORM::Batch.new, batch
   end
 
   def list
     ORM::Batch.all.map do |batch|
-      batch.lines = ORM::OrderLine.where(batch_id: batch.id)
-      ORM::Batch.to_model batch
+      to_model(batch)
     end
   end
 
@@ -34,7 +33,7 @@ class BatchRepositorySql < BatchRepository
   def to_model(batch)
     batch.lines = ORM::OrderLine.where(batch_id: batch.id)
     model = ORM::Batch.to_model batch
-    @session.add ORM::Batch, :save, model
+    @session.add batch, model
     model
   end
 end

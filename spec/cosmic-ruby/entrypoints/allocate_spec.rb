@@ -69,7 +69,7 @@ describe 'Route Allocate' do
     end
   end
 
-  fdescribe 'Route Change_Quantity' do
+  describe 'Route Change_Quantity' do
     before(:each) do
       batch = ORM::Batch.from(Batch.new Reference.new('R1'), Sku.new('TABLE'), Quantity.new(1), Custom::Date.new(1,1,2023))
       ORM::Batch.from(Batch.new Reference.new('R2'), Sku.new('TABLE'), Quantity.new(1), nil).save

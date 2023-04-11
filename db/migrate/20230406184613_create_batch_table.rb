@@ -5,6 +5,7 @@ class CreateBatchTable < ActiveRecord::Migration[6.0]
       t.string :sku
       t.integer :quantity
       t.string :eta
+      t.bigint :product_id
     end
   end
 end

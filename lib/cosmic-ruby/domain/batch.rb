@@ -41,4 +41,8 @@ class Batch
   def <=> other
     other.eta <=> self.eta
   end
+
+  def == other
+    other.class == self.class && other.reference == self.reference
+  end
 end
