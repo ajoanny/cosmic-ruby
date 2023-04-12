@@ -1,11 +1,14 @@
+require 'cosmic-ruby/domain/events'
+
 class Product
-  attr_reader :sku, :batches, :id, :version
+  attr_reader :sku, :batches, :id, :version, :events
   attr_writer :version
   def initialize sku, batches = [], id=nil, version=0
     @sku = sku
     @batches = batches
     @id = id
     @version = version
+    @events = []
   end
 
   def allocate order_line
@@ -19,7 +22,7 @@ class Product
       @version += 1
       batch.reference
     else
-      raise OutOfStock.new
+      @events << OutOfStockEvent.new
     end
   end
 end

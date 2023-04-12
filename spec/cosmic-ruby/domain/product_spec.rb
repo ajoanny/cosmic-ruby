@@ -64,12 +64,12 @@ describe Product do
     expect(reference).to eq Reference.new('REF2')
   end
 
-  it 'raises an exception when there is no batch available' do
+  it 'produces an event when is no batch available' do
     batch = Batch.new Reference.new('REF1'), Sku.new('A'), Quantity.new(1), Custom::Date.new(1, 1, 2000)
     product = Product.new Sku.new('A'), [batch]
     line = OrderLine.new OrderId.new('ID'), Sku.new('A'), Quantity.new(2)
-    exception = OutOfStock.new
+    product.allocate line
 
-    expect { product.allocate(line) }.to raise_error(exception)
+    expect(product.events[-1]).to be_instance_of(OutOfStockEvent)
   end
 end

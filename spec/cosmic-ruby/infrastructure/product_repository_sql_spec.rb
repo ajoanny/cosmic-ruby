@@ -29,7 +29,7 @@ describe ProductRepositorySql do
   end
 
   describe 'version' do
-    fit 'returns a product with all its batches' do
+    it 'returns a product with all its batches' do
       batch = Batch.new(Reference.new('REF'), Sku.new('TABLE'), Quantity.new(12), Custom::Date.new(1, 1, 2023), [OrderLine.new(OrderId.new('REF'), Sku.new('TABLE'), Quantity.new(2))])
       product = Product.new(Sku.new('TABLE'), [batch])
       ORM::Product.from(product).save
