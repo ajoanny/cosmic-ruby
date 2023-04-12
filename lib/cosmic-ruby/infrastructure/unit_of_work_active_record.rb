@@ -5,6 +5,7 @@ class UnitOfWorkActiveRecord
     @commit = false
     @session = session
     @batches = BatchRepositorySql.new session
+    @products = ProductRepositorySql.new session
   end
 
   def commit
@@ -28,6 +29,10 @@ class UnitOfWorkActiveRecord
 
   def batches
     @batches
+  end
+
+  def products
+    @products
   end
 
   private

@@ -9,10 +9,15 @@ class Session
 
   def commit
     @objects_to_persist.each do |orm, model|
-      a = orm._save(model)
-      p a
-      p orm
+      orm._save(model)
     end
     @objects_to_persist = []
+  end
+
+  def dispatch_events
+    @objects_to_persist
+      .map { |_, model| model.try(:events) }
+      .flatten
+      .each { |event| MessageBus.handle event }
   end
 end

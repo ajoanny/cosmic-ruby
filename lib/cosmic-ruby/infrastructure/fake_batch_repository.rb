@@ -4,8 +4,9 @@ require 'cosmic-ruby/infrastructure/ORM/order_line'
 
 class FakeBatchRepository < BatchRepository
 
-  def initialize set = Set[]
+  def initialize set = Set[], session = FakeSession.new
     @set = set
+    @session = session
   end
 
   def get(reference)

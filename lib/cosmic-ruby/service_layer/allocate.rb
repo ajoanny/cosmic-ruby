@@ -8,8 +8,6 @@ def allocate order_line, uow
     if product.nil?
       raise SkuUnknown.new order_line.sku
     end
-    begin
-    end
     reference = product.allocate order_line
     uow.commit
   end

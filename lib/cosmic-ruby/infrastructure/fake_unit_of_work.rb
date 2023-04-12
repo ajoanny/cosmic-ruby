@@ -1,11 +1,13 @@
 class FakeUnitOfWork
-  attr_reader :commit, :rollback
+  attr_reader :commit, :rollback, :events
 
-  def initialize batches, products = Set[]
+  def initialize repositories, session = FakeSession.new
     @commit = false
     @rollback = false
-    @batches = batches
-    @products = products
+    @batches = repositories[:batches]
+    @products = repositories[:products]
+    @session = session
+    @events = []
   end
 
   def commit
@@ -19,6 +21,12 @@ class FakeUnitOfWork
   def persists
     begin
       yield
+      puts @session.objects
+      @events = @session.objects
+              .map { |object| object.try(:events) || [] }
+              .map { |events| events[-1] }
+              .compact
+
     rescue Exception => e
       rollback
       raise e
