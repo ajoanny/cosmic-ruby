@@ -1,3 +1,4 @@
+require 'cosmic-ruby/service_layer/message_bus'
 require 'cosmic-ruby/domain/reference'
 require 'cosmic-ruby/domain/sku'
 require 'cosmic-ruby/domain/quantity'
@@ -6,6 +7,7 @@ require 'cosmic-ruby/domain/order_id'
 require 'cosmic-ruby/domain/batch'
 require 'cosmic-ruby/domain/order_line'
 require 'cosmic-ruby/infrastructure/fake_batch_repository'
+require 'cosmic-ruby/infrastructure/fake_product_repository'
 require 'cosmic-ruby/infrastructure/fake_session'
 require 'cosmic-ruby/service_layer/allocate'
 require 'cosmic-ruby/service_layer/deallocate'
@@ -14,13 +16,27 @@ require 'cosmic-ruby/service_layer/change_quantity'
 require 'cosmic-ruby/domain/errors/sku_unknown'
 require 'cosmic-ruby/infrastructure/fake_unit_of_work'
 
+class MessageBus
+  @@events = []
+
+  def self.handle event
+    @@events << event
+    handlers(event).each { |method| method.call(event) }
+  end
+
+  def self.events
+    @@events
+  end
+end
+
 describe 'Service Allocate' do
-  describe 'allocate' do
+  fdescribe 'allocate' do
     context 'when the sku is known' do
       it 'returns a batch added with its order lines' do
         batch = Batch.new(Reference.new('REF1'), Sku.new('TABLE'), Quantity.new(12), Custom::Date.new(1, 1, 2023))
-        repository = FakeBatchRepository.new Set[batch]
-        uow = FakeUnitOfWork.new repository
+        product = Product.new(Sku.new('TABLE'), [batch])
+        repository = FakeProductRepository.new Set[product]
+        uow = FakeUnitOfWork.new nil, repository
         reference = allocate(OrderLine.new(OrderId.new('REF'), Sku.new('TABLE'), Quantity.new(12)), uow)
 
         expect(reference).to eq Reference.new('REF1')
@@ -31,13 +47,26 @@ describe 'Service Allocate' do
     context 'when the sku is unknown' do
       it 'returns a batch added with its order lines' do
         batch = Batch.new(Reference.new('REF'), Sku.new('TABLE'), Quantity.new(12), Custom::Date.new(1, 1, 2023))
-        repository = FakeBatchRepository.new Set[batch]
-        uow = FakeUnitOfWork.new repository
+        product = Product.new(Sku.new('TABLE'), [batch])
+        repository = FakeProductRepository.new Set[product]
+        uow = FakeUnitOfWork.new nil, repository
         expect {
          allocate(OrderLine.new(OrderId.new('REF'), Sku.new('LAMP'), Quantity.new(12)), uow)
         }.to raise_error SkuUnknown.new(Sku.new('LAMP'))
         expect(uow).not_to be_committed
         expect(uow).to be_rollbacked
+      end
+    end
+
+    context 'when the is not available item' do
+      it 'produce an OutOfStockEvent' do
+        batch = Batch.new(Reference.new('REF'), Sku.new('TABLE'), Quantity.new(1), Custom::Date.new(1, 1, 2023))
+        product = Product.new(Sku.new('TABLE'), [batch])
+        repository = FakeProductRepository.new Set[product]
+        uow = FakeUnitOfWork.new nil, repository
+        allocate(OrderLine.new(OrderId.new('REF'), Sku.new('TABLE'), Quantity.new(12)), uow)
+
+        expect(MessageBus.events[-1]).to be_an_instance_of OutOfStockEvent
       end
     end
   end
