@@ -40,14 +40,16 @@ module ORM
       self.quantity =  model.quantity.value
       self.eta =  model.eta
 
-      self.order_lines = self.order_lines.reject { |orm_batch| !model.lines.map(&:id).include?(orm_batch.id) }
-      self.order_lines.each do |orm_order_line|
-        order_line = model.lines.find { |order_line| orm_order_line.id == order_line.id }
-        orm_order_line._update order_line
+      self.order_lines = model.lines.map do |line|
+        if line.id.nil?
+          orm = ORM::OrderLine.new
+        else
+          orm = OrderLine.find line.id
+        end
+        orm._update line
+        orm
       end
-      model.lines
-           .reject(&:id)
-           .each { |order_line| self.order_lines << ORM::OrderLine.from(order_line, self.id) }
     end
+
   end
 end

@@ -35,9 +35,17 @@ class UnitOfWorkActiveRecord
     @products
   end
 
+  def events
+    events = @session.new_events
+    @session.event_seen
+    events
+  end
+
   private
 
   def committed?
     @commit
   end
+
+
 end

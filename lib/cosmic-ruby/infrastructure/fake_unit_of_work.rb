@@ -1,5 +1,5 @@
 class FakeUnitOfWork
-  attr_reader :commit, :rollback, :events
+  attr_reader :commit, :rollback
 
   def initialize repositories, session = FakeSession.new
     @commit = false
@@ -21,12 +21,6 @@ class FakeUnitOfWork
   def persists
     begin
       yield
-      puts @session.objects
-      @events = @session.objects
-              .map { |object| object.try(:events) || [] }
-              .map { |events| events[-1] }
-              .compact
-
     rescue Exception => e
       rollback
       raise e
@@ -48,5 +42,11 @@ class FakeUnitOfWork
 
   def rollbacked?
     @rollback
+  end
+
+  def events
+    events = @session.objects.map(&:events).flatten
+    @session.clear
+    events
   end
 end

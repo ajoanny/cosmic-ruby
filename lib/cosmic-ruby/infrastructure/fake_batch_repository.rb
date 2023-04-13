@@ -10,11 +10,15 @@ class FakeBatchRepository < BatchRepository
   end
 
   def get(reference)
-    @set.find { |batch| batch.reference == reference }
+    batch = @set.find { |batch| batch.reference == reference }
+    @session.add batch
+    batch
   end
 
   def of(sku)
-    @set.select { |batch| batch.sku == sku }
+    batches = @set.select { |batch| batch.sku == sku }
+    batches.each { |batch| @session.add batch }
+    batches
   end
 
   def add(batch)
@@ -22,6 +26,8 @@ class FakeBatchRepository < BatchRepository
   end
 
   def list
+
+    @set.to_a.each { |batch| @session.add batch}
     @set.to_a
   end
 end

@@ -4,7 +4,7 @@ class FakeSession
     @objects = []
   end
 
-  def add _, model
+  def add model
     @objects << model
   end
 
@@ -14,5 +14,9 @@ class FakeSession
 
   def objects
     @objects
+  end
+
+  def clear
+    @objects = []
   end
 end

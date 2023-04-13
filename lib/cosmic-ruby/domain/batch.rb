@@ -1,5 +1,5 @@
 class Batch
-  attr :sku, :quantity, :lines, :eat
+  attr :sku, :quantity, :lines, :eat, :events
   attr_reader :reference, :eta
   attr_accessor :id
   def initialize reference, sku, quantity, eta, lines = []
@@ -8,6 +8,7 @@ class Batch
     @quantity = quantity
     @lines = lines
     @eta = eta
+    @events = []
   end
 
   def allocate order_line
@@ -34,7 +35,8 @@ class Batch
   def change_quantity quantity
     @quantity = quantity
     while available_quantity < Quantity.new(0)
-      lines.pop
+      line = lines.pop
+      @events << AllocationRequired.new(line)
     end
   end
 

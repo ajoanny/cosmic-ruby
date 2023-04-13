@@ -39,13 +39,15 @@ module ORM
         self.sku = model.sku.sku
         self.version = model.version
         self.batches = self.batches.reject { |orm_batch| !model.batches.map(&:id).include?(orm_batch.id) }
-        self.batches.each do |orm_batch|
-            batch = model.batches.find { |batch| orm_batch.id == batch.id }
-            orm_batch._update batch
+        self.batches = model.batches.map do |batch|
+          if batch.id.nil?
+            orm = ORM::Batch.new
+          else
+            orm = Batch.find batch.id
           end
-        model.batches
-             .reject(&:id)
-             .each { |order_line| self.batches << ORM::Batches.from(order_line, self.id) }
+          orm._update batch
+          orm
+        end
         save!
     end
   end

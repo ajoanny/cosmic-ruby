@@ -7,6 +7,10 @@ module ORM
     belongs_to :batch
     attr_accessor :model
 
+    def new_record?
+      id.nil?
+    end
+
     def self.from model, batch_id
       OrderLine.new id: model.id, order_id: model.order_id.id, sku: model.sku.sku, quantity: model.quantity.value, batch_id: batch_id
     end

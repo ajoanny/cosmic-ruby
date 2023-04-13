@@ -9,6 +9,7 @@ class Product
     @id = id
     @version = version
     @events = []
+
   end
 
   def allocate order_line

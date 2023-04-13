@@ -15,7 +15,7 @@ class ProductRepositorySql < ProductRepository
     end
     orm = ORM::Product.find_by(sku: sku.sku)
     unless orm
-      orm = ORM::Product.new sku: sku.sku, batches: batches, version: 0
+      orm = ORM::Product.new
     end
     product = ORM::Product.to_model orm
     @session.add orm, product
